@@ -1,5 +1,16 @@
-{{!-- The following component displays Ember's default welcome message. --}}
-<WelcomePage />
-{{!-- Feel free to remove this! --}}
-
-{{outlet}}
+<section id="app">
+    <header>
+        <h1>Connect 4</h1>
+    </header>
+    <article>
+        {{outlet}}
+    </article>
+    <footer>
+        <div class="float-left">
+            Powered by Ember.
+        </div>
+        <div class="float-right">
+            &#169; Shaun Halliday 2020
+        </div>
+    </footer>
+</section>
