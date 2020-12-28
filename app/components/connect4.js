@@ -95,15 +95,42 @@ export default Component.extend ({
             ) {
                 var x = Math.floor((ev.offsetX - 20) / 48.5);
                 var y = Math.floor((ev.offsetY - 40) / 50);
-                var state = this.get("state");
-                if(!state[x][y]) {
+
+                //Var y value of 5, this starts the count for the column,
+                // to ensure markers occupy the lowest possible grid
+
+                // Set y column value to 5 (6 grid in column as zero
+                // index valuation)
+                var y = 5;
+                var state = this.get('state');
+
+                //each time marker is placed, subrtact 1 from the Y 
+                // variable relevant to the column it is placed in.
+                while (state[x][y] == 'x' || state[x][y] == 'o'){
+                // Each time executed get the current column value of y
+                // and minus one off it so the next placement in that column
+                // is telling the program a grid, or multiple grid spaces
+                // are taken
+                y = y - 1;
+                }
+
+                // wrap the move_count and placement of markers in the
+                // column variable counter
+                if(y >= 0) {
                     var player = this.get("player");
                     state[x][y] = player;
 
+                    // For each move set the move count and marker variables,
+                    // the also set the visibiltiy of each marker to true,
+                    // then get the player variable and increase move
+                    // count by 1 on each turn
                     var move_count = this.get("moves")[player];
                     var marker  = this.get("markers")[player][move_count];
                     marker.visible = true;
+                    this.get('moves')[player] = move_count + 1;
 
+                    // The code so on placement of a marker with click
+                    // if player x place marker as per mathematical variables
                     if (player == "x") {
                         marker.x = 45 + x * 48.5;
                         marker.y = 66 + y * 50;
@@ -111,8 +138,11 @@ export default Component.extend ({
                         marker.x = 45 + x * 48.5;
                         marker.y = 66 + y * 50;
                     }
-                // this.check_winner();
-                this.get('moves')[player] = move_count + 1;
+
+                // If the player is player x set next player to o, and
+                // vice-versa, after this update the stage with all graphics
+                // actioned at this time, finally outside this check if we
+                // have a winner yet
                 if (player == 'x') {
                     this.set('player', 'o');
                 } else {
@@ -120,6 +150,7 @@ export default Component.extend ({
                 }
                 this.get('stage').update();
                 }
+                // this.check_winner();                
             }
         }
     },
@@ -132,15 +163,17 @@ export default Component.extend ({
                 this.set('playing', true);
                 this.set('winner', undefined);
                 this.set('draw', false);
-                // Sets state of board to all undefined
+                // Sets state of board to all undefined, as per column and row amounts
+                // in the board (6x7 board)
                 this.set('state', [
-                    [undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-                    [undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-                    [undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-                    [undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-                    [undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-                    [undefined, undefined, undefined, undefined, undefined, undefined, undefined]
-                ]);
+                    [undefined, undefined, undefined, undefined, undefined, undefined],
+                    [undefined, undefined, undefined, undefined, undefined, undefined],
+                    [undefined, undefined, undefined, undefined, undefined, undefined],
+                    [undefined, undefined, undefined, undefined, undefined, undefined],
+                    [undefined, undefined, undefined, undefined, undefined, undefined],
+                    [undefined, undefined, undefined, undefined, undefined, undefined],
+                    [undefined, undefined, undefined, undefined, undefined, undefined]]
+                );
                 this.set('moves', { 'x': 0, 'o': 0 });
                 this.set('player', 'x');
                 var markers = this.get('markers');
