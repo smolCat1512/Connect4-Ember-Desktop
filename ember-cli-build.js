@@ -21,6 +21,7 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
   app.import('node_modules/easeljs/lib/easeljs.min.js');
   app.import('node_modules/tweenjs/lib/tweenjs.min.js');
+  app.import('node_modules/soundjs/lib/soundjs.min.js');
 
   return app.toTree();
 };

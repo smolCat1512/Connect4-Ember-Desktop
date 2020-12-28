@@ -7,6 +7,13 @@ export default Component.extend ({
     winner: undefined,
     draw: false,
 
+    // Load sounds as required for application
+    init: function() {
+        this._super(...arguments);
+        createjs.Sound.registerSound("assets/sounds/markerplace.wav", "place-marker");
+        createjs.Sound.registerSound("assets/sounds/falling.wav", "falling");
+    },
+
     // Creation of didInsertElement function, this encompasses all
     // the required game functions
     didInsertElement: function() {
@@ -123,6 +130,7 @@ export default Component.extend ({
                 // wrap the move_count and placement of markers in the
                 // column variable counter
                 if(y >= 0) {
+                    createjs.Sound.play('place-marker');
                     var player = this.get("player");
                     state[x][y] = player;
 
@@ -318,6 +326,7 @@ export default Component.extend ({
                         createjs.Tween.get(markers.x[idx]).to({y: 600}, 500);
                         createjs.Tween.get(markers.o[idx]).to({y: 600}, 500);
                     }
+                    createjs.Sound.play("falling");
                     createjs.Tween.get(board).wait(500).to({alpha: 1}, 1000);
                 } else {
                     createjs.Tween.get(board).to({alpha: 1}, 1000);

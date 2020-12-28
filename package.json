@@ -60,6 +60,7 @@
   "dependencies": {
     "createjs": "^1.0.1",
     "easeljs": "^1.0.2",
+    "soundjs": "^1.0.1",
     "tweenjs": "^1.0.2"
   }
 }
