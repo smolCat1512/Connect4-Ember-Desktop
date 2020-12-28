@@ -43,6 +43,8 @@ export default Component.extend ({
         // board to the stage variable
         board.x = 20;
         board.y = 40;
+        board.alpha = 0;
+        this.set('board', board);
         stage.addChild(board);
 
         // Create players markers/pieces, leave as x and o as easier
@@ -80,7 +82,7 @@ export default Component.extend ({
         // update stage with the board
         this.set("markers", markers);
         this.set("stage", stage);
-        stage.update();
+        createjs.Ticker.addEventListener("tick", stage);
     },
 
     // Create click events function, this contains all the
@@ -305,6 +307,22 @@ export default Component.extend ({
             // Setup start function, when start button clicked all actions
             // in this section carried out
             start: function() {
+                var board = this.get('board');
+                board.alpha = 0;
+                
+                // implementation of code to animate markers falling off the
+                // screen when restart a game
+                if(this.get('playing')) {
+                    var markers = this.get('markers');
+                    for(var idx = 0; idx < 22; idx++) {
+                        createjs.Tween.get(markers.x[idx]).to({y: 600}, 500);
+                        createjs.Tween.get(markers.o[idx]).to({y: 600}, 500);
+                    }
+                    createjs.Tween.get(board).wait(500).to({alpha: 1}, 1000);
+                } else {
+                    createjs.Tween.get(board).to({alpha: 1}, 1000);
+                }
+
                 this.set('playing', true);
                 this.set('winner', undefined);
                 this.set('draw', false);
@@ -322,10 +340,6 @@ export default Component.extend ({
                 this.set('moves', { 'x': 0, 'o': 0 });
                 this.set('player', 'x');
                 var markers = this.get('markers');
-                for(var idx = 0; idx < 22; idx++) {
-                    markers.x[idx].visible = false;
-                    markers.o[idx].visible = false;
-                }
                 this.get('stage').update(); 
             }
         }
