@@ -344,7 +344,7 @@ export default Component.extend ({
 
                 //each time marker is placed, subrtact 1 from the Y 
                 // variable relevant to the column it is placed in.
-                while (state[x][y] == 'x'){
+                while (state[x][y] == 'x' || state[x][y] == 'o'){
                 // Each time executed get the current column value of y
                 // and minus one off it so the next placement in that column
                 // is telling the program a grid, or multiple grid spaces
