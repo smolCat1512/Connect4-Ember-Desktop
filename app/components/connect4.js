@@ -254,7 +254,8 @@ export default Component.extend ({
     // in a column and if so to place markers on top of
     // each other
     click: function(ev) {
-        if(this.get("playing") && !this.get("winner")) {
+        var component = this;
+        if(component.get("playing") && !component.get("winner")) {
             if (
                 ev.target.tagName.toLowerCase() === "canvas" &&
                 ev.offsetX >= 20 &&
@@ -271,7 +272,7 @@ export default Component.extend ({
                 // Set y column value to 5 (6 grid in column as zero
                 // index valuation)
                 var y = 5;
-                var state = this.get('state');
+                var state = component.get('state');
 
                 //each time marker is placed, subrtact 1 from the Y 
                 // variable relevant to the column it is placed in.
@@ -287,40 +288,21 @@ export default Component.extend ({
                 // column variable counter
                 if(y >= 0) {
                     createjs.Sound.play('place-marker');
-                    var player = this.get("player");
-                    state[x][y] = player;
-
+                    state[x][y] = 'x';
                     // For each move set the move count and marker variables,
                     // the also set the visibiltiy of each marker to true,
-                    // then get the player variable and increase move
-                    // count by 1 on each turn
-                    var move_count = this.get("moves")[player];
-                    var marker  = this.get("markers")[player][move_count];
+                    // now refactored to use component instead of this
+                    var move_count = component.get("moves")['x'];
+                    var marker  = component.get("markers")['x'][move_count];
                     marker.visible = true;
-                    this.get('moves')[player] = move_count + 1;
-
                     // The code so on placement of a marker with click
                     // if player x place marker as per mathematical variables
-                    if (player == "x") {
-                        marker.x = 45 + x * 48.5;
-                        marker.y = 66 + y * 50;
-                    } else {
-                        marker.x = 45 + x * 48.5;
-                        marker.y = 66 + y * 50;
-                    }
-
-                // If the player is player x set next player to o, and
-                // vice-versa, after this update the stage with all graphics
-                // actioned at this time, finally outside this check if we
-                // have a winner yet
-                if (player == 'x') {
-                    this.set('player', 'o');
-                } else {
-                    this.set('player', 'x');
+                    // , also check for winner and increase move count by one
+                    marker.x = 45 + x * 48.5;
+                    marker.y = 66 + y * 50;
+                    component.check_winner();
+                    component.get('moves')['x'] = move_count + 1;
                 }
-                this.get('stage').update();
-                }
-                this.check_winner();                
             }
         }
     },
@@ -352,7 +334,8 @@ export default Component.extend ({
                 board.alpha = 0;
                 
                 // implementation of code to animate markers falling off the
-                // screen when restart a game
+                // screen when restart a game and sounds for markers falling
+                // off the screen
                 if(this.get('playing')) {
                     var markers = this.get('markers');
                     for(var idx = 0; idx < 22; idx++) {
@@ -367,7 +350,7 @@ export default Component.extend ({
 
                 this.set('playing', true);
                 this.set('winner', undefined);
-                this.set('draw', false);
+                this.set('draw', undefined);
                 // Sets state of board to all undefined, as per column and row amounts
                 // in the board (6x7 board)
                 this.set('state', [
