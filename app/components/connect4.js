@@ -15,6 +15,14 @@
 
 import Component from "@ember/component";
 
+function deepClone(state) {
+    var new_state = [];
+    for(var idx1 = 0; idx1 < state.length; idx1++) {
+        new_state.push(state[idx1].slice(0));
+    }
+    return new_state;
+}
+
 
 // Start of the computer player creation, refactoring the
 // check_winner into an overarching check_game_winner function
@@ -27,65 +35,65 @@ function check_game_winner(state) {
     
         // All horizontal, vertical and diagonal patterns,
         // these are zero index arrays hence 0,1 style 
-        // All the vertical possible matches for wins
+        // All the horizontal possible matches for wins
     
-        //1st column  Verticals
+        //1st column  Horizontal
         [[0, 0], [1, 0], [2, 0], [3, 0]],
         [[1, 0], [2, 0], [3, 0], [4, 0]],
         [[2, 0], [3, 0], [4, 0], [5, 0]],
         [[3, 0], [4, 0], [5, 0], [6, 0]],
-        //2nd column  Verticals
+        //2nd column  Horizontal
         [[0, 1], [1, 1], [2, 1], [3, 1]],
         [[1, 1], [2, 1], [3, 1], [4, 1]],
         [[2, 1], [3, 1], [4, 1], [5, 1]],
         [[3, 1], [4, 1], [5, 1], [6, 1]],
-        //3rd column  Verticals
+        //3rd column  Horizontal
         [[0, 2], [1, 2], [2, 2], [3, 2]],
         [[1, 2], [2, 2], [3, 2], [4, 2]],
         [[2, 2], [3, 2], [4, 2], [5, 2]],
         [[3, 2], [4, 2], [5, 2], [6, 2]],
-        //4th column  Verticals
+        //4th column  Horizontal
         [[0, 3], [1, 3], [2, 3], [3, 3]],
         [[1, 3], [2, 3], [3, 3], [4, 3]],
         [[2, 3], [3, 3], [4, 3], [5, 3]],
         [[3, 3], [4, 3], [5, 3], [6, 3]],
-        //5th column  Verticals
+        //5th column  Horizontal
         [[0, 4], [1, 4], [2, 4], [3, 4]],
         [[1, 4], [2, 4], [3, 4], [4, 4]],
         [[2, 4], [3, 4], [4, 4], [5, 4]],
         [[3, 4], [4, 4], [5, 4], [6, 4]],
-        //6th column  Verticals
+        //6th column  Horizontal
         [[0, 5], [1, 5], [2, 5], [3, 5]],
         [[1, 5], [2, 5], [3, 5], [4, 5]],
         [[2, 5], [3, 5], [4, 5], [5, 5]],
         [[3, 5], [4, 5], [5, 5], [6, 5]],
     
-        // All the horizontal possible matches for wins
-        //1st column Horizontals
+        // All the vertical possible matches for wins
+        //1st column Verticals
         [[0, 0], [0, 1], [0, 2], [0, 3]],
         [[0, 1], [0, 2], [0, 3], [0, 4]],
         [[0, 2], [0, 3], [0, 4], [0, 5]],
-        //2nd column Horizontals
+        //2nd column Verticals
         [[1, 0], [1, 1], [1, 2], [1, 3]],
         [[1, 1], [1, 2], [1, 3], [1, 4]],
         [[1, 2], [1, 3], [1, 4], [1, 5]],
-        //3rd column Horizontals
+        //3rd column Verticals
         [[2, 0], [2, 1], [2, 2], [2, 3]],
         [[2, 1], [2, 2], [2, 3], [2, 4]],
         [[2, 2], [2, 3], [2, 4], [2, 5]],
-        //4th column Horizontals
+        //4th column Verticals
         [[3, 0], [3, 1], [3, 2], [3, 3]],
         [[3, 1], [3, 2], [3, 3], [3, 4]],
         [[3, 2], [3, 3], [3, 4], [3, 5]],
-        //5th column  Horizontals
+        //5th column  Verticals
         [[4, 0], [4, 1], [4, 2], [4, 3]],
         [[4, 1], [4, 2], [4, 3], [4, 4]],
         [[4, 2], [4, 3], [4, 4], [4, 5]],
-        //6th column  Horizontals
+        //6th column  Verticals
         [[5, 0], [5, 1], [5, 2], [5, 3]],
         [[5, 1], [5, 2], [5, 3], [5, 4]],
         [[5, 2], [5, 3], [5, 4], [5, 5]],
-        //7th column  Horizontals
+        //7th column  Verticals
         [[6, 0], [6, 1], [6, 2], [6, 3]],
         [[6, 1], [6, 2], [6, 3], [6, 4]],
         [[6, 2], [6, 3], [6, 4], [6, 5]],
@@ -140,10 +148,9 @@ function check_game_winner(state) {
              }
             }
             
-            
             var draw = true;
-            for(var x = 0; x <= 6; x++) {
-                for(var y = 0; y <= 5; y++) {
+            for(var x = 0; x <= 7; x++) {
+                for(var y = 0; y <= 6; y++) {
                     if(!state[x][y]) {
                         return undefined;
                     }
@@ -152,6 +159,67 @@ function check_game_winner(state) {
             return '';
         }
 
+
+        function minimax(state, limit, player) {
+             var moves = []
+             if(limit > 0) {
+                 for(var idx1 = 0; idx1 < 7; idx1++) {
+                     for(var idx2 = 0; idx2 < 6; idx2++) {
+                         if(state[idx1][idx2] === undefined) {
+                             var move = {
+                                x: idx1,
+                                y: idx2,
+                                   state: deepClone(state),
+                                   score: 0
+                               };
+                               move.state[idx1][idx2] = player;
+                               if (limit === 1 || check_game_winner(move.state) !== undefined) {
+                                if (check_game_winner(move.state) !== undefined) {
+                                  let winner = check_game_winner(move.state);
+                                  if (winner === 'o') {
+                                    move.score = 1000;
+                                  } else if (winner === 'x') {
+                                    move.score = -1000;
+                                  }
+                                }
+                              } else {
+                                move.moves = minimax(move.state, limit - 1, player == 'x' ? 'o' : 'x');
+                                let score = undefined;
+                                for (let idx3 = 0; idx3 < move.moves.length; idx3++) {
+                                  if (score === undefined) {
+                                    score = move.moves[idx3].score;
+                                  } else if (player === 'x') {
+                                    score = Math.max(score, move.moves[idx3].score);
+                                  } else if (player === 'o') {
+                                    score = Math.min(score, move.moves[idx3].score);
+                                  }
+                                }
+                                move.score = score;
+                              }
+                               moves.push(move);
+                           }
+                       }
+                   }
+               }
+               return moves;
+           }
+
+
+        // the computer move function implementation, this
+        // is actioned on the component by the setTimeout function
+        function computer_move(state) {
+                var moves = minimax(state, 2, 'o');
+                var max_score = undefined;
+                var move = undefined;
+                for(var idx = 0; idx < moves.length; idx++) {
+                    max_score = moves[idx].score;
+                    move = {
+                        x: moves[idx].x,
+                        y: moves[idx].y
+                    }
+                }
+            return move;
+           }
 
 // Start of the main body of code for all other game functions
 export default Component.extend ({
@@ -219,7 +287,7 @@ export default Component.extend ({
 
         // for loop, 21 counters per player as there are 42 places
         // on the connect 4 board
-        for(var x = 0; x < 22; x++) {
+        for(var x = 0; x < 21; x++) {
             //Create the yellow token/game piece
             var yellowPiece = new createjs.Shape();
             graphics = yellowPiece.graphics;
@@ -276,7 +344,7 @@ export default Component.extend ({
 
                 //each time marker is placed, subrtact 1 from the Y 
                 // variable relevant to the column it is placed in.
-                while (state[x][y] == 'x' || state[x][y] == 'o'){
+                while (state[x][y] == 'x'){
                 // Each time executed get the current column value of y
                 // and minus one off it so the next placement in that column
                 // is telling the program a grid, or multiple grid spaces
@@ -302,6 +370,25 @@ export default Component.extend ({
                     marker.y = 66 + y * 50;
                     component.check_winner();
                     component.get('moves')['x'] = move_count + 1;
+
+                    // Starting point for the computer player implementation
+                    setTimeout(function() {
+                        if(!component.get('winner') && !component.get('draw')) {
+                            createjs.Sound.play('place-marker');
+                            var move = computer_move(state);
+                            move_count = component.get('moves')['o'];
+                            state[move.x][move.y] = 'o';
+                            marker = component.get('markers')['o'][move_count];
+                            marker.visible = true;
+                            marker.x = 45 + move.x * 48.5;
+                            marker.y = 66 + move.y * 50;
+                            component.get('moves')['o'] = move_count + 1;
+                            
+                            component.get('stage').update();
+
+                            component.check_winner();
+                        }
+                    }, 500);
                 }
             }
         }
@@ -338,7 +425,7 @@ export default Component.extend ({
                 // off the screen
                 if(this.get('playing')) {
                     var markers = this.get('markers');
-                    for(var idx = 0; idx < 22; idx++) {
+                    for(var idx = 0; idx < 21; idx++) {
                         createjs.Tween.get(markers.x[idx]).to({y: 600}, 500);
                         createjs.Tween.get(markers.o[idx]).to({y: 600}, 500);
                     }
