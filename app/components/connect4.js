@@ -1,3 +1,18 @@
+/*
+    Author - Shaun Halliday
+    This is the main component code that creates connect 4,
+    this code consists of:
+    - drawing the board
+    - implement player pieces/markers
+    - match winning patters
+    - handle clicks
+    - animate visuals
+    - play sounds on actions
+    - implement a computer player
+    - have mobile input actions
+*/
+
+
 import Component from "@ember/component";
 
 export default Component.extend ({
@@ -12,6 +27,8 @@ export default Component.extend ({
         this._super(...arguments);
         createjs.Sound.registerSound("assets/sounds/markerplace.wav", "place-marker");
         createjs.Sound.registerSound("assets/sounds/falling.wav", "falling");
+        createjs.Sound.registerSound("assets/sounds/winner.wav", "winner");
+
     },
 
     // Creation of didInsertElement function, this encompasses all
@@ -290,6 +307,7 @@ export default Component.extend ({
             }
         if(winner) {
             this.set('winner', winner);
+            createjs.Sound.play('winner');
             break;
             }
          }
