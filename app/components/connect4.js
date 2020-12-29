@@ -15,6 +15,145 @@
 
 import Component from "@ember/component";
 
+
+// Start of the computer player creation, refactoring the
+// check_winner into an overarching check_game_winner function
+// and this will be implemented within the game in the 
+// check_winner function
+function check_game_winner(state) {
+
+    // Outline all the possible patterns for wins
+    var patterns = [
+    
+        // All horizontal, vertical and diagonal patterns,
+        // these are zero index arrays hence 0,1 style 
+        // All the vertical possible matches for wins
+    
+        //1st column  Verticals
+        [[0, 0], [1, 0], [2, 0], [3, 0]],
+        [[1, 0], [2, 0], [3, 0], [4, 0]],
+        [[2, 0], [3, 0], [4, 0], [5, 0]],
+        [[3, 0], [4, 0], [5, 0], [6, 0]],
+        //2nd column  Verticals
+        [[0, 1], [1, 1], [2, 1], [3, 1]],
+        [[1, 1], [2, 1], [3, 1], [4, 1]],
+        [[2, 1], [3, 1], [4, 1], [5, 1]],
+        [[3, 1], [4, 1], [5, 1], [6, 1]],
+        //3rd column  Verticals
+        [[0, 2], [1, 2], [2, 2], [3, 2]],
+        [[1, 2], [2, 2], [3, 2], [4, 2]],
+        [[2, 2], [3, 2], [4, 2], [5, 2]],
+        [[3, 2], [4, 2], [5, 2], [6, 2]],
+        //4th column  Verticals
+        [[0, 3], [1, 3], [2, 3], [3, 3]],
+        [[1, 3], [2, 3], [3, 3], [4, 3]],
+        [[2, 3], [3, 3], [4, 3], [5, 3]],
+        [[3, 3], [4, 3], [5, 3], [6, 3]],
+        //5th column  Verticals
+        [[0, 4], [1, 4], [2, 4], [3, 4]],
+        [[1, 4], [2, 4], [3, 4], [4, 4]],
+        [[2, 4], [3, 4], [4, 4], [5, 4]],
+        [[3, 4], [4, 4], [5, 4], [6, 4]],
+        //6th column  Verticals
+        [[0, 5], [1, 5], [2, 5], [3, 5]],
+        [[1, 5], [2, 5], [3, 5], [4, 5]],
+        [[2, 5], [3, 5], [4, 5], [5, 5]],
+        [[3, 5], [4, 5], [5, 5], [6, 5]],
+    
+        // All the horizontal possible matches for wins
+        //1st column Horizontals
+        [[0, 0], [0, 1], [0, 2], [0, 3]],
+        [[0, 1], [0, 2], [0, 3], [0, 4]],
+        [[0, 2], [0, 3], [0, 4], [0, 5]],
+        //2nd column Horizontals
+        [[1, 0], [1, 1], [1, 2], [1, 3]],
+        [[1, 1], [1, 2], [1, 3], [1, 4]],
+        [[1, 2], [1, 3], [1, 4], [1, 5]],
+        //3rd column Horizontals
+        [[2, 0], [2, 1], [2, 2], [2, 3]],
+        [[2, 1], [2, 2], [2, 3], [2, 4]],
+        [[2, 2], [2, 3], [2, 4], [2, 5]],
+        //4th column Horizontals
+        [[3, 0], [3, 1], [3, 2], [3, 3]],
+        [[3, 1], [3, 2], [3, 3], [3, 4]],
+        [[3, 2], [3, 3], [3, 4], [3, 5]],
+        //5th column  Horizontals
+        [[4, 0], [4, 1], [4, 2], [4, 3]],
+        [[4, 1], [4, 2], [4, 3], [4, 4]],
+        [[4, 2], [4, 3], [4, 4], [4, 5]],
+        //6th column  Horizontals
+        [[5, 0], [5, 1], [5, 2], [5, 3]],
+        [[5, 1], [5, 2], [5, 3], [5, 4]],
+        [[5, 2], [5, 3], [5, 4], [5, 5]],
+        //7th column  Horizontals
+        [[6, 0], [6, 1], [6, 2], [6, 3]],
+        [[6, 1], [6, 2], [6, 3], [6, 4]],
+        [[6, 2], [6, 3], [6, 4], [6, 5]],
+    
+    
+        // All the diagonals, first left to right,
+        // then right to left
+        //Diagonals (Left to Right)
+        [[3, 0], [2, 1], [1, 2], [0, 3]],  //work
+        [[4, 0], [3, 1], [2, 2], [1, 3]],  //work
+        [[3, 1], [2, 2], [1, 3], [0, 4]],  //work
+        [[5, 0], [4, 1], [3, 2], [2, 3]],  //work
+        [[4, 1], [3, 2], [2, 3], [1, 4]],  //work
+        [[3, 2], [2, 3], [1, 4], [0, 5]],  //work
+        [[5, 1], [4, 2], [3, 3], [2, 4]],  //work
+        [[4, 2], [3, 3], [2, 4], [1, 5]],  //work
+        [[3, 3], [4, 2], [5, 1], [6, 0]],  //Work
+        [[5, 2], [4, 3], [3, 4], [2, 5]],  //work
+        [[3, 4], [4, 3], [5, 2], [6, 1]],  //work
+        [[3, 5], [4, 4], [5, 3], [6, 2]],  //work
+    
+        //Diagonals (Right to Left)
+        [[6, 3], [5, 2], [4, 1], [3, 0]],  //work
+        [[6, 4], [5, 3], [4, 2], [3, 1]],  //work
+        [[5, 3], [4, 2], [3, 1], [2, 0]],  //work
+        [[5, 3], [4, 2], [3, 1], [2, 0]],  //work
+        [[6, 5], [5, 4], [4, 3], [3, 2]],  //work
+        [[5, 4], [4, 3], [3, 2], [2, 1]],  //work
+        [[4, 3], [3, 2], [2, 1], [1, 0]],  //work
+        [[5, 5], [4, 4], [3, 3], [2, 2]],  //work
+        [[4, 4], [3, 3], [2, 2], [1, 1]],  //work
+        [[3, 3], [2, 2], [1, 1], [0, 0]],  //work
+        [[4, 5], [3, 4], [2, 3], [1, 2]],  //work
+        [[3, 4], [2, 3], [1, 2], [0, 1]],  //work
+        [[3, 5], [2, 4], [1, 3], [0, 2]],  //work
+        ];
+        
+        for(var pidx = 0; pidx < patterns.length; pidx++) {
+            var pattern = patterns[pidx];
+            var winner = state[pattern[0][0]][pattern[0][1]];
+    
+            if(winner) {
+                for(var idx = 1; idx < pattern.length; idx++) {
+                    if(winner != state[pattern[idx][0]][pattern[idx][1]]) {
+                        winner = undefined;
+                        break;
+                    }
+                }
+            if(winner) {
+                return winner;
+                }
+             }
+            }
+            
+            
+            var draw = true;
+            for(var x = 0; x <= 6; x++) {
+                for(var y = 0; y <= 5; y++) {
+                    if(!state[x][y]) {
+                        return undefined;
+                    }
+                }
+            }
+            return '';
+        }
+
+
+// Start of the main body of code for all other game functions
 export default Component.extend ({
 
     // Set playing, winner and draw states
@@ -186,145 +325,21 @@ export default Component.extend ({
         }
     },
 
-    // Create check_winner function, this contains all the patterns,
-    // the loops to check for winners and draws and sets the states
-    // accordingly
+    // Refactored check_winner function, pulling
+    // in the states and functionality from the 
+    // check_game_winner function at the top of this code,
+    // outside the component definition
     check_winner: function() {
-        
-    // Outline all the possible patterns for wins
-    var patterns = [
-    
-    // All horizontal, vertical and diagonal patterns,
-    // these are zero index arrays hence 0,1 style 
-    // All the vertical possible matches for wins
-
-    //1st column  Verticals
-    [[0, 0], [1, 0], [2, 0], [3, 0]],
-    [[1, 0], [2, 0], [3, 0], [4, 0]],
-    [[2, 0], [3, 0], [4, 0], [5, 0]],
-    [[3, 0], [4, 0], [5, 0], [6, 0]],
-    //2nd column  Verticals
-    [[0, 1], [1, 1], [2, 1], [3, 1]],
-    [[1, 1], [2, 1], [3, 1], [4, 1]],
-    [[2, 1], [3, 1], [4, 1], [5, 1]],
-    [[3, 1], [4, 1], [5, 1], [6, 1]],
-    //3rd column  Verticals
-    [[0, 2], [1, 2], [2, 2], [3, 2]],
-    [[1, 2], [2, 2], [3, 2], [4, 2]],
-    [[2, 2], [3, 2], [4, 2], [5, 2]],
-    [[3, 2], [4, 2], [5, 2], [6, 2]],
-    //4th column  Verticals
-    [[0, 3], [1, 3], [2, 3], [3, 3]],
-    [[1, 3], [2, 3], [3, 3], [4, 3]],
-    [[2, 3], [3, 3], [4, 3], [5, 3]],
-    [[3, 3], [4, 3], [5, 3], [6, 3]],
-    //5th column  Verticals
-    [[0, 4], [1, 4], [2, 4], [3, 4]],
-    [[1, 4], [2, 4], [3, 4], [4, 4]],
-    [[2, 4], [3, 4], [4, 4], [5, 4]],
-    [[3, 4], [4, 4], [5, 4], [6, 4]],
-    //6th column  Verticals
-    [[0, 5], [1, 5], [2, 5], [3, 5]],
-    [[1, 5], [2, 5], [3, 5], [4, 5]],
-    [[2, 5], [3, 5], [4, 5], [5, 5]],
-    [[3, 5], [4, 5], [5, 5], [6, 5]],
-
-    // All the horizontal possible matches for wins
-    //1st column Horizontals
-    [[0, 0], [0, 1], [0, 2], [0, 3]],
-    [[0, 1], [0, 2], [0, 3], [0, 4]],
-    [[0, 2], [0, 3], [0, 4], [0, 5]],
-    //2nd column Horizontals
-    [[1, 0], [1, 1], [1, 2], [1, 3]],
-    [[1, 1], [1, 2], [1, 3], [1, 4]],
-    [[1, 2], [1, 3], [1, 4], [1, 5]],
-    //3rd column Horizontals
-    [[2, 0], [2, 1], [2, 2], [2, 3]],
-    [[2, 1], [2, 2], [2, 3], [2, 4]],
-    [[2, 2], [2, 3], [2, 4], [2, 5]],
-    //4th column Horizontals
-    [[3, 0], [3, 1], [3, 2], [3, 3]],
-    [[3, 1], [3, 2], [3, 3], [3, 4]],
-    [[3, 2], [3, 3], [3, 4], [3, 5]],
-    //5th column  Horizontals
-    [[4, 0], [4, 1], [4, 2], [4, 3]],
-    [[4, 1], [4, 2], [4, 3], [4, 4]],
-    [[4, 2], [4, 3], [4, 4], [4, 5]],
-    //6th column  Horizontals
-    [[5, 0], [5, 1], [5, 2], [5, 3]],
-    [[5, 1], [5, 2], [5, 3], [5, 4]],
-    [[5, 2], [5, 3], [5, 4], [5, 5]],
-    //7th column  Horizontals
-    [[6, 0], [6, 1], [6, 2], [6, 3]],
-    [[6, 1], [6, 2], [6, 3], [6, 4]],
-    [[6, 2], [6, 3], [6, 4], [6, 5]],
-
-
-    // All the diagonals, first left to right,
-    // then right to left
-    //Diagonals (Left to Right)
-    [[3, 0], [2, 1], [1, 2], [0, 3]],  //work
-    [[4, 0], [3, 1], [2, 2], [1, 3]],  //work
-    [[3, 1], [2, 2], [1, 3], [0, 4]],  //work
-    [[5, 0], [4, 1], [3, 2], [2, 3]],  //work
-    [[4, 1], [3, 2], [2, 3], [1, 4]],  //work
-    [[3, 2], [2, 3], [1, 4], [0, 5]],  //work
-    [[5, 1], [4, 2], [3, 3], [2, 4]],  //work
-    [[4, 2], [3, 3], [2, 4], [1, 5]],  //work
-    [[3, 3], [4, 2], [5, 1], [6, 0]],  //Work
-    [[5, 2], [4, 3], [3, 4], [2, 5]],  //work
-    [[3, 4], [4, 3], [5, 2], [6, 1]],  //work
-    [[3, 5], [4, 4], [5, 3], [6, 2]],  //work
-
-    //Diagonals (Right to Left)
-    [[6, 3], [5, 2], [4, 1], [3, 0]],  //work
-    [[6, 4], [5, 3], [4, 2], [3, 1]],  //work
-    [[5, 3], [4, 2], [3, 1], [2, 0]],  //work
-    [[5, 3], [4, 2], [3, 1], [2, 0]],  //work
-    [[6, 5], [5, 4], [4, 3], [3, 2]],  //work
-    [[5, 4], [4, 3], [3, 2], [2, 1]],  //work
-    [[4, 3], [3, 2], [2, 1], [1, 0]],  //work
-    [[5, 5], [4, 4], [3, 3], [2, 2]],  //work
-    [[4, 4], [3, 3], [2, 2], [1, 1]],  //work
-    [[3, 3], [2, 2], [1, 1], [0, 0]],  //work
-    [[4, 5], [3, 4], [2, 3], [1, 2]],  //work
-    [[3, 4], [2, 3], [1, 2], [0, 1]],  //work
-    [[3, 5], [2, 4], [1, 3], [0, 2]],  //work
-    ];
-
-    var state = this.get('state');
-
-    for(var pidx = 0; pidx < patterns.length; pidx++) {
-        var pattern = patterns[pidx];
-        var winner = state[pattern[0][0]][pattern[0][1]];
-
-        if(winner) {
-            for(var idx = 1; idx < pattern.length; idx++) {
-                if(winner != state[pattern[idx][0]][pattern[idx][1]]) {
-                    winner = undefined;
-                    break;
-                }
-            }
-        if(winner) {
-            this.set('winner', winner);
-            createjs.Sound.play('winner');
-            break;
-            }
-         }
-        }
-        
-        if(!this.get('winner')) {
-        var draw = true;
-        for(var x = 0; x <= 6; x++) {
-            for(var y = 0; y <= 5; y++) {
-                if(!state[x][y]) {
-                    draw = false;
-                    break;
-                }
+        var state = this.get('state');
+        var winner = check_game_winner(state);
+        if(winner !== undefined) {
+            if(winner === '') {
+                this.set('draw', true);
+            } else {
+                this.set('winner', winner);
+                createjs.Sound.play('winner');
             }
         }
-        this.set('draw', draw);
-        }  
     },
 
 
