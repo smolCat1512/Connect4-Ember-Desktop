@@ -148,7 +148,7 @@ function check_game_winner(state) {
              }
             }
             
-            var draw = true;
+            // Loop over all the columns and row
             for(var x = 0; x <= 7; x++) {
                 for(var y = 0; y <= 6; y++) {
                     if(!state[x][y]) {
@@ -530,7 +530,7 @@ export default Component.extend ({
 
                             component.check_winner();
                         }
-                    }, 500);
+                    }, 300);
                 }
             }
         }
