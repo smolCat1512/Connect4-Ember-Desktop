@@ -159,7 +159,153 @@ function check_game_winner(state) {
             return '';
         }
 
+        /*  All the patterns for scoring, all possible ways 
+        that the computer can win
+        */
 
+        var patterns = [
+            {
+            pattern: [['p', 0, 1], ['p', 0, 1], ['p', 0, 1], ['p']],
+            score: 1000
+            },
+            {
+            pattern: [['p', 0, -1], ['p', 0, -1], ['p', 0, -1], ['p']],
+            score: 1000
+            },
+            {
+            pattern: [['p', 1, 0], ['p', 1, 0], ['p', 1, 0], ['p']],
+            score: 1000
+            },
+            {
+            pattern: [['p', -1, 0], ['p', -1, 0], ['p', -1, 0], ['p']],
+            score: 1000
+            },
+            {
+            pattern: [['p', 1, 1], ['p', 1, 1], ['p', 1, 1], ['p']],
+            score: 1000
+            },
+            {
+            pattern: [['p', 1, -1], ['p', 1, -1], ['p', 1, -1], ['p']],
+            score: 1000
+            },
+            {
+            pattern: [['p', 0, 1], ['p', 0, 1], ['p']],
+            score: 100
+            },
+            {
+            pattern: [['p', 0, -1], ['p', 0, -1], ['p']],
+            score: 100
+            },
+            {
+            pattern: [['p', 1, 0], ['p', 1, 0], ['p']],
+            score: 100
+            },
+            {
+            pattern: [['p', -1, 0], ['p', -1, 0], ['p']],
+            score: 100
+            },
+            {
+            pattern: [['p', 1, 1], ['p', 1, 1], ['p']],
+            score: 100
+            },
+            {
+            pattern: [['p', 1, -1], ['p', 1, -1], ['p']],
+            score: 100
+            },
+            {
+            pattern: [['p', 0, 1], ['p']],
+            score: 50
+            },
+            {
+            pattern: [['p', 0, -1], ['p']],
+            score: 50
+            },
+            {
+            pattern: [['p', 1, 0], ['p']],
+            score: 50
+            },
+            {
+            pattern: [['p', -1, 0], ['p']],
+            score: 50
+            },
+            {
+            pattern: [['p', 1, 1], ['p']],
+            score: 50
+            },
+            {
+            pattern: [['p', 1, -1], ['p']],
+            score: 50
+            }
+        ];
+  
+
+        function match_pattern_at(state, pattern, player, x, y) {
+                if(x >= 0 && x < state.length) {
+                    if(y >= 0 && y < state[x].length) {
+                        var element = pattern[0];
+                        if(element[0] == 'p') {
+                            if(state[x][y] !== player) {
+                                return false;
+                            }
+                        } else if(element[0] == ' ') {
+                           if(state[x][y] !== undefined) {
+                               return false;
+                           }
+                       }
+                       if(pattern.length > 1) {
+                           return match_pattern_at(state, pattern.slice(1), player, x + element[1], y + element[2])
+                       } else {
+                            return true;
+                       }
+                   }
+               }
+               return false;
+           }
+           
+
+
+
+
+        /*  Creation of match pattern function, this helps with
+        the heuristic implementation in the component definition
+        */
+        function match_pattern(state, pattern, player) {
+            for(var idx1 = 0; idx1 < state.length; idx1++) {
+                for(var idx2 = 0; idx2 < state[idx1].length; idx2++) {
+                    var matches = match_pattern_at(state, pattern, player, idx1, idx2);
+                    if(matches) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        /*  creation of the heuristic function, creating a
+        score variable to judge the strength of current
+        patterns and increasing score variable accordingly
+        */
+       function heuristic(state) {
+        var score = 0;
+        for(var idx = 0; idx < patterns.length; idx++) {
+            if(match_pattern(state, patterns[idx].pattern, 'o')) {
+                score = score + patterns[idx].score;
+            }
+            if(match_pattern(state, patterns[idx].pattern, 'x')) {
+                score = score - patterns[idx].score;
+            }
+        }
+        return score;
+        }
+
+        /* creation and implementation of the minimax function,
+        it evaluates the moves, runs through thew index, 
+        incorporates the deepClone function, and then loops
+        assigning scores to current placements, finally returning
+        the current moves into the function recursively until
+        a winner is found
+        */
         function minimax(state, limit, player) {
              var moves = []
              if(limit > 0) {
@@ -174,18 +320,11 @@ function check_game_winner(state) {
                                };
                                move.state[idx1][idx2] = player;
                                if (limit === 1 || check_game_winner(move.state) !== undefined) {
-                                if (check_game_winner(move.state) !== undefined) {
-                                  let winner = check_game_winner(move.state);
-                                  if (winner === 'o') {
-                                    move.score = 1000;
-                                  } else if (winner === 'x') {
-                                    move.score = -1000;
-                                  }
-                                }
-                              } else {
+                                   move.score = heuristic(move.state);
+                               } else {
                                 move.moves = minimax(move.state, limit - 1, player == 'x' ? 'o' : 'x');
-                                let score = undefined;
-                                for (let idx3 = 0; idx3 < move.moves.length; idx3++) {
+                                var score = undefined;
+                                for (var idx3 = 0; idx3 < move.moves.length; idx3++) {
                                   if (score === undefined) {
                                     score = move.moves[idx3].score;
                                   } else if (player === 'x') {
@@ -207,8 +346,11 @@ function check_game_winner(state) {
 
         // the computer move function implementation, this
         // is actioned on the component by the setTimeout function
+        // if the value after state in minimax is amended the
+        // computer player gets more difficult to beat the higher
+        // the value
         function computer_move(state) {
-                var moves = minimax(state, 2, 'o');
+                var moves = minimax(state, 3, 'o');
                 var max_score = undefined;
                 var move = undefined;
                 for(var idx = 0; idx < moves.length; idx++) {
@@ -374,7 +516,6 @@ export default Component.extend ({
                     // Starting point for the computer player implementation
                     setTimeout(function() {
                         if(!component.get('winner') && !component.get('draw')) {
-                            createjs.Sound.play('place-marker');
                             var move = computer_move(state);
                             move_count = component.get('moves')['o'];
                             state[move.x][move.y] = 'o';
@@ -385,6 +526,7 @@ export default Component.extend ({
                             component.get('moves')['o'] = move_count + 1;
                             
                             component.get('stage').update();
+                            createjs.Sound.play('place-marker');
 
                             component.check_winner();
                         }
